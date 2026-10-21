@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><title>Trang chủ</title></head>
+<body>
+<div th:fragment="content">
+    <!-- Welcome header -->
+    <div class="mb-4">
+        <h1 class="page-title mb-1">
+            Xin chào, <span style="color:#6366f1" sec:authentication="name">Khách</span>!
+        </h1>
+        <p class="text-muted mb-0">Chào mừng bạn đến với hệ thống quản lý phòng trọ.</p>
+    </div>
+
+    <!-- Thong tin phong (hien thi neu co hop dong active) -->
+    <div th:if="${soPhong != null}" class="card-box mb-4 p-4"
+         style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;">
+        <div class="d-flex align-items-center gap-3">
+            <div style="width:52px;height:52px;background:rgba(255,255,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-door-open" style="font-size:1.5rem"></i>
+            </div>
+            <div>
+                <div style="font-size:.8rem;opacity:.8;text-transform:uppercase;letter-spacing:.05em;">Phòng đang thuê</div>
+                <div style="font-size:1.4rem;font-weight:700;" th:text="'Phòng ' + ${soPhong}"></div>
+                <div style="font-size:.85rem;opacity:.85;" th:text="${tenToaNha}"></div>
+            </div>
+            <div class="ms-auto text-end" th:if="${soHoaDonChuaTT != null and soHoaDonChuaTT > 0}">
+                <div style="background:rgba(255,255,255,.2);border-radius:10px;padding:8px 14px;">
+                    <div style="font-size:1.5rem;font-weight:700;" th:text="${soHoaDonChuaTT}"></div>
+                    <div style="font-size:.75rem;opacity:.9;">HĐ chưa thanh toán</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chua co hop dong -->
+    <div th:if="${soPhong == null}" class="alert alert-info mb-4" style="border-radius:12px;">
+        <i class="bi bi-info-circle me-2"></i>
+        Bạn chưa có hợp đồng thuê phòng đang hiệu lực. Vui lòng liên hệ chủ trọ.
+    </div>
+
+    <!-- Quick access cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-md-4">
+            <a th:href="@{/tenant/hoa-don}" class="text-decoration-none">
+                <div class="stat-card position-relative">
+                    <div th:if="${soHoaDonChuaTT != null and soHoaDonChuaTT > 0}"
+                         style="position:absolute;top:12px;right:12px;background:#ef4444;color:#fff;border-radius:99px;font-size:.68rem;font-weight:600;padding:2px 8px;"
+                         th:text="${soHoaDonChuaTT} + ' chưa TT'"></div>
+                    <div class="stat-icon" style="background:#eef2ff;color:#6366f1">
+                        <i class="bi bi-receipt"></i>
+                    </div>
+                    <div class="stat-val">Hóa đơn</div>
+                    <div class="stat-lbl">Xem & thanh toán hóa đơn</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <a th:href="@{/tenant/chi-so}" class="text-decoration-none">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#fffbeb;color:#d97706">
+                        <i class="bi bi-lightning-charge"></i>
+                    </div>
+                    <div class="stat-val">Điện / Nước</div>
+                    <div class="stat-lbl">Xem chỉ số tháng này</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <a th:href="@{/tenant/su-co}" class="text-decoration-none">
+                <div class="stat-card position-relative">
+                    <div th:if="${soSuCoDangXuLy != null and soSuCoDangXuLy > 0}"
+                         style="position:absolute;top:12px;right:12px;background:#f59e0b;color:#fff;border-radius:99px;font-size:.68rem;font-weight:600;padding:2px 8px;"
+                         th:text="${soSuCoDangXuLy} + ' đang xử lý'"></div>
+                    <div class="stat-icon" style="background:#fce7f3;color:#db2777">
+                        <i class="bi bi-tools"></i>
+                    </div>
+                    <div class="stat-val">Sự cố</div>
+                    <div class="stat-lbl">Báo & theo dõi sự cố</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Huong dan su dung -->
+    <div class="card-box p-3" style="background:#f8fafc;">
+        <h5 style="font-size:.88rem;font-weight:600;color:#374151;margin-bottom:10px;">
+            <i class="bi bi-lightbulb me-2" style="color:#f59e0b"></i>Hướng dẫn nhanh
+        </h5>
+        <div class="row g-2">
+            <div class="col-md-4">
+                <div class="d-flex gap-2 align-items-start">
+                    <div style="width:28px;height:28px;background:#eef2ff;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <span style="font-size:.75rem;font-weight:700;color:#6366f1">1</span>
+                    </div>
+                    <div style="font-size:.82rem;color:#64748b;">
+                        <strong>Xem hóa đơn</strong> hàng tháng và nhấn <em>"Báo đã chuyển khoản"</em> sau khi thanh toán.
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex gap-2 align-items-start">
+                    <div style="width:28px;height:28px;background:#fffbeb;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <span style="font-size:.75rem;font-weight:700;color:#d97706">2</span>
+                    </div>
+                    <div style="font-size:.82rem;color:#64748b;">
+                        <strong>Kiểm tra chỉ số</strong> điện nước mỗi tháng để đối chiếu với hóa đơn.
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex gap-2 align-items-start">
+                    <div style="width:28px;height:28px;background:#fce7f3;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <span style="font-size:.75rem;font-weight:700;color:#db2777">3</span>
+                    </div>
+                    <div style="font-size:.82rem;color:#64748b;">
+                        <strong>Báo sự cố</strong> khi thiết bị hỏng hóc để chủ trọ xử lý kịp thời.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

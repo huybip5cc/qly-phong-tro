@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<!-- Bỏ th:replace="~{layout/base :: html-body}" -->
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><title>Form Khách thuê</title></head>
+<body>
+
+<!-- Bọc trong div fragment="content" -->
+<div th:fragment="content">
+    <div class="d-flex align-items-center gap-2 mb-3">
+        <a th:href="@{/landlord/khach-thue}" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;"><i class="bi bi-arrow-left"></i></a>
+        <h1 class="page-title mb-0" th:text="${pageTitle}">Form Khách thuê</h1>
+    </div>
+    <div class="card-box" style="max-width:580px;">
+        <div class="card-box-hd">
+            <h5><i class="bi bi-person me-2" style="color:#6366f1"></i>Thông tin khách thuê</h5>
+        </div>
+        <div class="p-4">
+            <form th:action="${id != null ? '/landlord/khach-thue/sua/' + id : '/landlord/khach-thue/them'}"
+                  th:object="${khachRequest}" method="post" novalidate>
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                <div class="mb-3">
+                    <label for="hoTen" class="form-label fw-500">Họ tên <span class="text-danger">*</span></label>
+                    <input type="text" id="hoTen" th:field="*{hoTen}" class="form-control"
+                           th:classappend="${#fields.hasErrors('hoTen')} ? 'is-invalid'" placeholder="Nguyễn Văn A">
+                    <div class="invalid-feedback" th:errors="*{hoTen}"></div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-7">
+                        <label for="cccd" class="form-label fw-500">Số CCCD <span class="text-danger">*</span></label>
+                        <input type="text" id="cccd" th:field="*{cccd}" class="form-control"
+                               th:classappend="${#fields.hasErrors('cccd')} ? 'is-invalid'" placeholder="012345678901">
+                        <div class="invalid-feedback" th:errors="*{cccd}"></div>
+                    </div>
+                    <div class="col-5">
+                        <label for="ngaySinh" class="form-label fw-500">Ngày sinh</label>
+                        <input type="date" id="ngaySinh" th:field="*{ngaySinh}" class="form-control">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="sdt" class="form-label fw-500">Số điện thoại</label>
+                    <input type="text" id="sdt" th:field="*{sdt}" class="form-control" placeholder="0901234567">
+                </div>
+
+                <!-- Chi hien thi khi them moi -->
+                <div th:if="${id == null}" class="mb-4 p-3 rounded" style="background:#f8fafc; border:1px solid #e2e8f0;">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="taoTaiKhoan" name="taoTaiKhoan"
+                               onchange="toggleTaiKhoan(this)">
+                        <label class="form-check-label fw-500" for="taoTaiKhoan">
+                            Tạo tài khoản đăng nhập cho khách này
+                        </label>
+                    </div>
+                    <div id="taiKhoanBox" style="display:none;">
+                        <div class="mb-2">
+                            <label class="form-label" style="font-size:.85rem;">Username</label>
+                            <input type="text" name="username" class="form-control form-control-sm" placeholder="VD: khach01">
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size:.85rem;">Mật khẩu</label>
+                            <input type="password" name="password" class="form-control form-control-sm" placeholder="Tối thiểu 6 ký tự">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-accent">
+                        <i class="bi bi-check-circle me-1"></i>
+                        <span th:text="${id != null ? 'Cập nhật' : 'Thêm mới'}">Lưu</span>
+                    </button>
+                    <a th:href="@{/landlord/khach-thue}" class="btn btn-outline-secondary" style="border-radius:8px;">Hủy</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Đặt script vào bên trong fragment content để chạy được qua layout/base -->
+    <script>
+        function toggleTaiKhoan(cb) {
+            var box = document.getElementById('taiKhoanBox');
+            if (box) {
+                box.style.display = cb.checked ? 'block' : 'none';
+            }
+        }
+    </script>
+</div>
+</body>
+</html>

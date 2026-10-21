@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><title>Phí dịch vụ</title></head>
+<body>
+<div th:fragment="content">
+    <h1 class="page-title">Phí dịch vụ</h1>
+    <div class="row g-3">
+        <!-- Danh sách phí bên trái -->
+        <div class="col-lg-7">
+            <div class="card-box">
+                <div class="card-box-hd">
+                    <h5><i class="bi bi-collection me-2" style="color:#6366f1"></i>Danh sách phí dịch vụ</h5>
+                    <small class="text-muted" th:text="${danhSach != null ? danhSach.size() : 0} + ' phí'"></small>
+                </div>
+                <div th:if="${danhSach == null or danhSach.isEmpty()}" class="p-5 text-center text-muted">
+                    <i class="bi bi-collection" style="font-size:3rem;opacity:.3"></i>
+                    <p class="mt-2">Chưa có phí dịch vụ nào.</p>
+                </div>
+                <ul class="list-group list-group-flush" th:if="${danhSach != null and !danhSach.isEmpty()}">
+                    <li th:each="phi : ${danhSach}"
+                        class="list-group-item d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fw-500" th:text="${phi.tenPhi}"></span>
+                                <!-- Hiển thị loại tính -->
+                                <span class="badge"
+                                      th:classappend="${phi.loaiTinh != null and phi.loaiTinh.name() == 'THEO_NGUOI'} ? 'bg-info' : 'bg-secondary'"
+                                      style="font-size: .75rem;"
+                                      th:text="${phi.loaiTinh != null and phi.loaiTinh.name() == 'THEO_NGUOI'} ? 'Theo người' : 'Theo phòng'"></span>
+                            </div>
+                            <div class="text-success fw-600" style="font-size:.9rem"
+                                 th:text="${#numbers.formatDecimal(phi.soTien,0,'COMMA',0,'POINT')} +
+                                          (${phi.loaiTinh != null and phi.loaiTinh.name() == 'THEO_NGUOI'} ? ' đ/người/tháng' : ' đ/tháng')"></div>
+                        </div>
+                        <div class="d-flex gap-2 align-items-center">
+                            <span th:classappend="${phi.dangApDung} ? 'bg-active' : 'bg-ngung'"
+                                  class="badge"
+                                  th:text="${phi.dangApDung} ? 'Đang áp dụng' : 'Tạm tắt'"></span>
+                            <form th:action="@{/landlord/phi-dich-vu/{id}/toggle(id=${phi.id})}" method="post">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" style="border-radius:7px;" title="Bật/Tắt">
+                                    <i th:class="${phi.dangApDung} ? 'bi bi-toggle-on' : 'bi bi-toggle-off'"></i>
+                                </button>
+                            </form>
+                            <form th:action="@{/landlord/phi-dich-vu/{id}/xoa(id=${phi.id})}" method="post"
+                                  onsubmit="return confirm('Xóa phí này?')">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" style="border-radius:7px;">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Form thêm mới bên phải -->
+        <div class="col-lg-5">
+            <div class="card-box">
+                <div class="card-box-hd"><h5>Thêm phí mới</h5></div>
+                <div class="p-4">
+                    <form th:action="@{/landlord/phi-dich-vu/them}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <div class="mb-3">
+                            <label class="form-label fw-500">Tên phí <span class="text-danger">*</span></label>
+                            <input type="text" name="tenPhi" class="form-control"
+                                   placeholder="VD: Mạng Internet, Vệ sinh, Gửi xe..." required>
+                        </div>
+                        <!-- Ô chọn Theo phòng hoặc Theo người -->
+                        <div class="mb-3">
+                            <label class="form-label fw-500">Cách tính <span class="text-danger">*</span></label>
+                            <select name="loaiTinh" class="form-select">
+                                <option value="THEO_PHONG">Cố định theo phòng (VD: Mạng Internet)</option>
+                                <option value="THEO_NGUOI">Tính theo người (VD: Vệ sinh, dịch vụ chung)</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-500">Số tiền (đ/tháng) <span class="text-danger">*</span></label>
+                            <input type="number" name="soTien" class="form-control"
+                                   placeholder="VD: 100000" min="0" step="1000" required>
+                        </div>
+                        <button type="submit" class="btn btn-accent w-100">
+                            <i class="bi bi-plus-circle me-1"></i>Thêm phí
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

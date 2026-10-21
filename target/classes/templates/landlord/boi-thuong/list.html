@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><title>Bồi thường thiệt hại</title></head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="page-title mb-0">Quản lý Bồi thường thiệt hại</h1>
+        <a th:href="@{/landlord/boi-thuong/them}" class="btn btn-accent">
+            <i class="bi bi-plus-circle me-1"></i>Tạo yêu cầu bồi thường
+        </a>
+    </div>
+
+    <!-- Alert flash -->
+    <div th:if="${successMsg}" class="alert alert-success alert-dismissible fade show alert-flash mb-3">
+        <i class="bi bi-check-circle me-2"></i><span th:text="${successMsg}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible fade show alert-flash mb-3">
+        <i class="bi bi-exclamation-circle me-2"></i><span th:text="${errorMsg}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card-box">
+        <div class="card-box-hd">
+            <h5><i class="bi bi-shield-exclamation me-2" style="color:#6366f1"></i>Danh sách Bồi thường</h5>
+            <small class="text-muted" th:text="${danhSach.size()} + ' bản ghi'"></small>
+        </div>
+        <div th:if="${danhSach.isEmpty()}" class="p-5 text-center text-muted">
+            <i class="bi bi-shield-check" style="font-size:3rem;opacity:.3"></i>
+            <p class="mt-2">Không có khoản bồi thường nào.</p>
+        </div>
+        <div class="table-responsive" th:if="${!danhSach.isEmpty()}">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Phòng</th>
+                        <th>Khách đại diện</th>
+                        <th>Mô tả thiệt hại</th>
+                        <th>Số tiền</th>
+                        <th>Nguồn phát hiện</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày ghi nhận</th>
+                        <th>Chi tiết</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item, st : ${danhSach}">
+                        <td th:text="${st.count}" class="text-muted"></td>
+                        <td>
+                            <strong th:text="${'Phòng ' + item.soPhong}"></strong>
+                            <div class="text-muted" style="font-size:.76rem" th:text="${item.tenToaNha}"></div>
+                        </td>
+                        <td th:text="${item.tenKhachDaiDien ?: '—'}"></td>
+                        <td style="max-width:200px;">
+                            <span th:text="${#strings.abbreviate(item.moTa, 50)}"></span>
+                            <div th:if="${item.suCoId != null}" class="text-muted" style="font-size:.75rem;">
+                                <i class="bi bi-tools me-1"></i>Từ sự cố #<span th:text="${item.suCoId}"></span>
+                            </div>
+                        </td>
+                        <td class="fw-600 text-danger" th:text="${#numbers.formatDecimal(item.soTien, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${item.nguonPhatHien.name() == 'TRONG_LUC_O'} ? 'bg-primary' : 'bg-warning text-dark'"
+                                  th:text="${item.nguonPhatHienLabel}"></span>
+                        </td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${item.trangThai.name() == 'TRANG_THAI_0'} ? 'bg-chua-tt' :
+                                                 (${item.trangThai.name() == 'TRANG_THAI_1'} ? 'bg-cho-duyet' : 'bg-da-tt')"
+                                  th:text="${item.trangThaiLabel}"></span>
+                        </td>
+                        <td th:text="${#temporals.format(item.ngayGhiNhan,'dd/MM/yyyy')}"></td>
+                        <td>
+                            <a th:href="@{/landlord/boi-thuong/{id}(id=${item.id})}"
+                               class="btn btn-sm btn-outline-primary" style="border-radius:7px;">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

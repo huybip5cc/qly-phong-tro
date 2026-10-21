@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><title>Bảng giá</title></head>
+<body>
+<div th:fragment="content">
+    <h1 class="page-title">Bảng giá Điện / Nước</h1>
+    <div class="row g-3">
+        <div class="col-lg-5">
+            <div class="card-box">
+                <div class="card-box-hd">
+                    <h5><i class="bi bi-currency-dollar me-2" style="color:#6366f1"></i>Đơn giá hiện tại</h5>
+                </div>
+                <div class="p-4" th:if="${bangGia != null}">
+                    <div class="mb-3 p-3 rounded" style="background:#fffbeb; border:1px solid #fef08a;">
+                        <div style="font-size:.78rem;color:#854d0e;font-weight:600">ĐIỆN</div>
+                        <div style="font-size:1.5rem;font-weight:700;color:#1e293b"
+                             th:text="${#numbers.formatDecimal(bangGia.donGiaDien,0,'COMMA',0,'POINT')} + ' đ/số'"></div>
+                    </div>
+                    <div class="p-3 rounded" style="background:#eff6ff; border:1px solid #bfdbfe;">
+                        <div style="font-size:.78rem;color:#1e40af;font-weight:600">NƯỚC</div>
+                        <div style="font-size:1.5rem;font-weight:700;color:#1e293b"
+                             th:text="${#numbers.formatDecimal(bangGia.donGiaNuoc,0,'COMMA',0,'POINT')} + ' đ/khối'"></div>
+                    </div>
+                </div>
+                <div class="p-4 text-muted" th:if="${bangGia == null}">Chưa có bảng giá.</div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="card-box">
+                <div class="card-box-hd"><h5>Cập nhật đơn giá</h5></div>
+                <div class="p-4">
+                    <form th:action="@{/landlord/bang-gia}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <div class="mb-3">
+                            <label class="form-label fw-500">Đơn giá điện (đ/số)</label>
+                            <input type="number" name="donGiaDien" class="form-control"
+                                   th:value="${bangGia?.donGiaDien}" placeholder="VD: 4000" min="0" step="100">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-500">Đơn giá nước (đ/m³)</label>
+                            <input type="number" name="donGiaNuoc" class="form-control"
+                                   th:value="${bangGia?.donGiaNuoc}" placeholder="VD: 35000" min="0" step="500">
+                        </div>
+                        <button type="submit" class="btn btn-accent">
+                            <i class="bi bi-save me-1"></i>Lưu bảng giá
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

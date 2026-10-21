@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><title>Chỉ số điện nước</title></head>
+<body>
+<div th:fragment="content">
+    <h1 class="page-title">Chỉ số Điện / Nước</h1>
+
+    <!-- Thong tin phong -->
+    <div th:if="${soPhong != null}" class="card-box p-3 mb-3 d-flex align-items-center gap-3"
+         style="background:linear-gradient(135deg,#eef2ff,#f0f9ff);">
+        <div style="width:42px;height:42px;background:#6366f1;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+            <i class="bi bi-lightning-charge" style="color:#fff;font-size:1.1rem"></i>
+        </div>
+        <div>
+            <div style="font-weight:600;color:#1e293b;" th:text="'Phòng ' + ${soPhong} + ' — ' + ${tenToaNha}"></div>
+            <div class="text-muted" style="font-size:.8rem;">Lịch sử chỉ số điện nước của phòng bạn đang thuê</div>
+        </div>
+    </div>
+
+    <!-- Canh bao khong co hop dong -->
+    <div th:if="${infoMsg != null}" class="alert alert-info" style="border-radius:10px;font-size:.875rem;">
+        <i class="bi bi-info-circle me-2"></i>
+        <span th:text="${infoMsg}"></span>
+    </div>
+
+    <div class="card-box">
+        <div class="card-box-hd">
+            <h5><i class="bi bi-lightning-charge me-2" style="color:#6366f1"></i>Chỉ số phòng của bạn</h5>
+            <small class="text-muted" th:if="${danhSach != null}"
+                   th:text="${danhSach.size()} + ' kỳ'"></small>
+        </div>
+
+        <div th:if="${danhSach == null or danhSach.isEmpty()}" class="p-5 text-center text-muted">
+            <i class="bi bi-lightning" style="font-size:3rem;opacity:.3"></i>
+            <p class="mt-2 mb-1">Chưa có dữ liệu chỉ số.</p>
+            <small>Chỉ số sẽ hiển thị sau khi chủ trọ nhập mỗi tháng.</small>
+        </div>
+
+        <div class="table-responsive" th:if="${danhSach != null and !danhSach.isEmpty()}">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Tháng</th>
+                        <th class="text-center"><i class="bi bi-lightning-charge text-warning"></i> Điện (số)</th>
+                        <th class="text-center"><i class="bi bi-droplet text-primary"></i> Nước (khối)</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${danhSach}">
+                        <td><strong th:text="${item.thangNam}"></strong></td>
+                        <td class="text-center">
+                            <span th:text="${item.chiSoDienCu} + ' → ' + ${item.chiSoDienMoi}"
+                                  class="text-muted"></span>
+                            <div class="fw-600 text-warning" style="font-size:.8rem;"
+                                 th:text="'(' + ${item.chiSoDienMoi.subtract(item.chiSoDienCu)} + ' số)'"></div>
+                        </td>
+                        <td class="text-center">
+                            <span th:text="${item.chiSoNuocCu} + ' → ' + ${item.chiSoNuocMoi}"
+                                  class="text-muted"></span>
+                            <div class="fw-600 text-primary" style="font-size:.8rem;"
+                                 th:text="'(' + ${item.chiSoNuocMoi.subtract(item.chiSoNuocCu)} + ' khối)'"></div>
+                        </td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${item.trangThai.name() == 'TAM_TINH'} ? 'bg-chua-tt' :
+                                                 (${item.trangThai.name() == 'DA_CHOT'} ? 'bg-da-tt' : 'bg-cho-duyet')"
+                                  th:text="${item.trangThaiLabel}"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

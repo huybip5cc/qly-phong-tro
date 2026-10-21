@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><title>Chi tiết Sự cố</title></head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex align-items-center gap-2 mb-3">
+        <a th:href="@{/landlord/su-co}" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;"><i class="bi bi-arrow-left"></i></a>
+        <h1 class="page-title mb-0">Sự cố #<span th:text="${suCo.id}"></span></h1>
+    </div>
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="card-box">
+                <div class="card-box-hd">
+                    <h5><i class="bi bi-tools me-2" style="color:#6366f1"></i>Thông tin sự cố</h5>
+                    <span class="badge"
+                          th:classappend="${suCo.trangThai.name() == 'MOI'} ? 'bg-moi' :
+                                         (${suCo.trangThai.name() == 'DANG_XU_LY'} ? 'bg-dang-xl' :
+                                         (${suCo.trangThai.name() == 'HOAN_THANH'} ? 'bg-da-tt' : 'bg-ngung'))"
+                          th:text="${suCo.trangThaiLabel}"></span>
+                </div>
+                <div class="p-4">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="text-muted" style="font-size:.77rem">Phòng</div>
+                            <div class="fw-600" th:text="${'Phòng ' + suCo.soPhong}"></div>
+                            <div class="text-muted" style="font-size:.8rem" th:text="${suCo.tenToaNha}"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted" style="font-size:.77rem">Người báo</div>
+                            <div th:text="${suCo.tenNguoiBao}"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted" style="font-size:.77rem">Thiết bị liên quan</div>
+                            <div th:text="${suCo.tenThietBi ?: 'Không xác định'}"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted" style="font-size:.77rem">Nguyên nhân</div>
+                            <div th:text="${suCo.nguyenNhanLabel ?: '—'}"></div>
+                        </div>
+                        <div class="col-12">
+                            <div class="text-muted" style="font-size:.77rem">Mô tả sự cố</div>
+                            <div class="p-2 mt-1 rounded" style="background:#f8fafc; font-size:.88rem;"
+                                 th:text="${suCo.moTa}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Actions theo trang thai -->
+                    <div class="mt-4 pt-3 border-top">
+                        <div th:if="${suCo.trangThai.name() == 'MOI'}" class="d-flex gap-2">
+                            <form th:action="@{/landlord/su-co/{id}/cap-nhat(id=${suCo.id})}" method="post">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                <input type="hidden" name="trangThai" value="1">
+                                <button class="btn btn-sm btn-outline-warning" style="border-radius:8px;">
+                                    <i class="bi bi-wrench me-1"></i>Bắt đầu xử lý
+                                </button>
+                            </form>
+                        </div>
+                        <div th:if="${suCo.trangThai.name() == 'DANG_XU_LY'}">
+                            <form th:action="@{/landlord/su-co/{id}/hoan-thanh(id=${suCo.id})}" method="post"
+                                  class="d-flex gap-2 align-items-end">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                <div>
+                                    <label class="form-label mb-1" style="font-size:.82rem;">Nguyên nhân <span class="text-danger">*</span></label>
+                                    <select name="nguyenNhan" class="form-select form-select-sm" style="min-width:180px;">
+                                        <option th:each="nn : ${nguyenNhanList}"
+                                                th:value="${nn.value}"
+                                                th:text="${nn.label}"></option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-sm btn-success" style="border-radius:8px;">
+                                    <i class="bi bi-check-circle me-1"></i>Hoàn thành
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card-box">
+                <div class="card-box-hd"><h5>Thời gian</h5></div>
+                <div class="p-3" style="font-size:.875rem;">
+                    <div><span class="text-muted">Ngày báo:</span> <span th:text="${#temporals.format(suCo.ngayBao,'dd/MM/yyyy HH:mm')}"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

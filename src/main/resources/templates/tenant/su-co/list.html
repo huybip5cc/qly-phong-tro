@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><title>Sự cố của tôi</title></head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="page-title mb-0">Sự cố của tôi</h1>
+        <a th:href="@{/tenant/su-co/bao}" class="btn btn-accent">
+            <i class="bi bi-plus-circle me-1"></i>Báo sự cố mới
+        </a>
+    </div>
+    <div class="card-box">
+        <div th:if="${danhSach.isEmpty()}" class="p-5 text-center text-muted">
+            <i class="bi bi-check-circle" style="font-size:3rem;opacity:.3"></i>
+            <p class="mt-2">Bạn chưa có sự cố nào.</p>
+        </div>
+        <div class="table-responsive" th:if="${!danhSach.isEmpty()}">
+            <table class="table">
+                <thead>
+                    <tr><th>Mô tả</th><th>Thiết bị</th><th>Trạng thái</th><th>Ngày báo</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${danhSach}">
+                        <td th:text="${#strings.abbreviate(item.moTa, 80)}"></td>
+                        <td th:text="${item.tenThietBi ?: '—'}"></td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${item.trangThai.name() == 'MOI'} ? 'bg-moi' :
+                                                 (${item.trangThai.name() == 'DANG_XU_LY'} ? 'bg-dang-xl' :
+                                                 (${item.trangThai.name() == 'HOAN_THANH'} ? 'bg-da-tt' : 'bg-ngung'))"
+                                  th:text="${item.trangThaiLabel}"></span>
+                        </td>
+                        <td th:text="${#temporals.format(item.ngayBao,'dd/MM/yyyy')}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

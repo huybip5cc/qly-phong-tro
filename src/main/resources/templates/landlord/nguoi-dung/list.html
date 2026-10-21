@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><title>Tài khoản</title></head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="page-title mb-0">Quản lý Tài khoản</h1>
+        <a th:href="@{/landlord/nguoi-dung/them}" class="btn btn-accent">
+            <i class="bi bi-person-plus me-1"></i>Tạo tài khoản
+        </a>
+    </div>
+    <div class="card-box">
+        <div class="card-box-hd">
+            <h5><i class="bi bi-person-gear me-2" style="color:#6366f1"></i>Tài khoản hệ thống</h5>
+            <small class="text-muted" th:text="${danhSach != null ? danhSach.size() : 0} + ' tài khoản'"></small>
+        </div>
+        <div class="table-responsive" th:if="${danhSach != null and !danhSach.isEmpty()}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Username</th>
+                    <th>Họ tên</th>
+                    <th>Vai trò</th>
+                    <th>SĐT</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item, st : ${danhSach}">
+                    <td th:text="${st.count}" class="text-muted"></td>
+                    <td><code th:text="${item.username}"></code></td>
+                    <td th:text="${item.hoTen}"></td>
+                    <td>
+                            <span class="badge"
+                                  th:classappend="${item.vaiTro != null and item.vaiTro.name() == 'CHU_TRO'} ? 'bg-cho-duyet' : 'bg-trang'"
+                                  th:text="${item.vaiTroLabel}"></span>
+                    </td>
+                    <td th:text="${item.sdt ?: '—'}"></td>
+                    <td>
+                            <span class="badge"
+                                  th:classappend="${item.trangThai != null and item.trangThai.name() == 'ACTIVE'} ? 'bg-active' : 'bg-ngung'"
+                                  th:text="${item.trangThaiLabel}"></span>
+                    </td>
+                    <td th:text="${#temporals.format(item.ngayTao,'dd/MM/yyyy')}"></td>
+                    <td>
+                        <form th:if="${item.trangThai != null and item.trangThai.name() == 'ACTIVE'}"
+                              th:action="@{/landlord/nguoi-dung/{id}/khoa(id=${item.id})}" method="post"
+                              class="d-inline">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <button type="submit" class="btn btn-sm btn-outline-warning" style="border-radius:7px;" title="Khóa">
+                                <i class="bi bi-lock"></i>
+                            </button>
+                        </form>
+                        <form th:if="${item.trangThai != null and item.trangThai.name() != 'ACTIVE'}"
+                              th:action="@{/landlord/nguoi-dung/{id}/mo-khoa(id=${item.id})}" method="post"
+                              class="d-inline">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <button type="submit" class="btn btn-sm btn-outline-success" style="border-radius:7px;" title="Mở khóa">
+                                <i class="bi bi-unlock"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${danhSach == null or danhSach.isEmpty()}" class="p-5 text-center text-muted">
+            <i class="bi bi-people" style="font-size:3rem;opacity:.3"></i>
+            <p class="mt-2">Chưa có tài khoản nào.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

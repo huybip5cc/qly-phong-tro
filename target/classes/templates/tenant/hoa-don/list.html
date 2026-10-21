@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><title>Hóa đơn của tôi</title></head>
+<body>
+<div th:fragment="content">
+    <h1 class="page-title">Hóa đơn của tôi</h1>
+
+    <div class="card-box">
+        <div class="card-box-hd">
+            <h5><i class="bi bi-receipt me-2" style="color:#6366f1"></i>Danh sách hóa đơn</h5>
+            <small class="text-muted" th:if="${danhSach != null}"
+                   th:text="${danhSach.size()} + ' hóa đơn'"></small>
+        </div>
+        <div th:if="${danhSach == null or danhSach.isEmpty()}" class="p-5 text-center text-muted">
+            <i class="bi bi-receipt" style="font-size:3rem;opacity:.3"></i>
+            <p class="mt-2 mb-1">Bạn chưa có hóa đơn nào.</p>
+            <small>Hóa đơn sẽ được chủ trọ tạo mỗi tháng và hiển thị tại đây.</small>
+        </div>
+        <div class="table-responsive" th:if="${danhSach != null and !danhSach.isEmpty()}">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Tháng</th>
+                        <th>Phòng</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Chi tiết</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${danhSach}">
+                        <td><strong th:text="${item.thangNam}"></strong></td>
+                        <td class="text-muted" th:text="${item.soPhong} + ' — ' + ${item.tenToaNha}"></td>
+                        <td class="fw-600 text-success"
+                            th:text="${#numbers.formatDecimal(item.tongTien,0,'COMMA',0,'POINT')} + ' đ'"></td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${item.trangThai.name() == 'CHUA_THANH_TOAN'} ? 'bg-chua-tt' :
+                                                 (${item.trangThai.name() == 'CHO_DUYET'} ? 'bg-cho-duyet' : 'bg-da-tt')"
+                                  th:text="${item.trangThaiLabel}"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{/tenant/hoa-don/{id}(id=${item.id})}"
+                               class="btn btn-sm btn-outline-primary" style="border-radius:7px;">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
