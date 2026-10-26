@@ -22,6 +22,10 @@ public class NguoiDung {
     @Column(name = "password", nullable = false, length = 255)
     private String password;
 
+    @Column(name = "must_change_password", nullable = false)
+    @Builder.Default
+    private boolean mustChangePassword = false;
+
     @Column(name = "ho_ten", nullable = false, length = 100)
     private String hoTen;
 

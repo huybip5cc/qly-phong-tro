@@ -35,8 +35,13 @@
                 </div>
                 <div class="row g-3 mb-3">
                     <div class="col-6">
-                        <label for="sdt" class="form-label fw-500">Số điện thoại</label>
-                        <input type="text" id="sdt" th:field="*{sdt}" class="form-control">
+                        <label for="sdt" class="form-label fw-500">Số điện thoại
+                            <span id="sdtRequired" class="text-danger" style="display:none;">*</span>
+                        </label>
+                        <input type="tel" id="sdt" th:field="*{sdt}" class="form-control"
+                               th:classappend="${#fields.hasErrors('sdt')} ? 'is-invalid'"
+                               inputmode="numeric" maxlength="10" pattern="[0-9]{10}">
+                        <div class="invalid-feedback" th:errors="*{sdt}"></div>
                     </div>
                     <div class="col-6">
                         <label for="email" class="form-label fw-500">Email</label>
@@ -51,6 +56,16 @@
                     </select>
                     <div class="invalid-feedback" th:errors="*{vaiTro}"></div>
                 </div>
+                <script>
+                    function updatePhoneRequirement() {
+                        var tenant = document.querySelector('select[name="vaiTro"]').value === '0';
+                        var phone = document.getElementById('sdt');
+                        phone.required = tenant;
+                        document.getElementById('sdtRequired').style.display = tenant ? 'inline' : 'none';
+                    }
+                    document.querySelector('select[name="vaiTro"]').addEventListener('change', updatePhoneRequirement);
+                    updatePhoneRequirement();
+                </script>
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-accent"><i class="bi bi-check-circle me-1"></i>Tạo tài khoản</button>
                     <a th:href="@{/landlord/nguoi-dung}" class="btn btn-outline-secondary" style="border-radius:8px;">Hủy</a>

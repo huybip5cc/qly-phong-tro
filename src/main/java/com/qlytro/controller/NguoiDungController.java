@@ -41,6 +41,11 @@ public class NguoiDungController {
     public String them(@Valid @ModelAttribute("request") NguoiDungRequest request,
                        BindingResult result, Model model,
                        RedirectAttributes redirectAttributes) {
+        if (Integer.valueOf(0).equals(request.getVaiTro())
+                && (request.getSdt() == null || !request.getSdt().matches("[0-9]{10}"))) {
+            result.rejectValue("sdt", "phone.invalid",
+                    "Số điện thoại khách thuê là bắt buộc và phải gồm đúng 10 chữ số.");
+        }
         if (result.hasErrors()) {
             model.addAttribute("vaiTroList", VaiTroNguoiDung.values());
             model.addAttribute("pageTitle", "Tạo Tài khoản");
@@ -63,6 +68,14 @@ public class NguoiDungController {
     public String moKhoa(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         nguoiDungService.moKhoa(id);
         redirectAttributes.addFlashAttribute("successMsg", "Đã mở khóa tài khoản.");
+        return "redirect:/landlord/nguoi-dung";
+    }
+
+    @PostMapping("/{id}/reset-password")
+    public String resetPassword(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+        nguoiDungService.resetTenantPassword(id);
+        redirectAttributes.addFlashAttribute("successMsg",
+                "Đã đặt lại mật khẩu về 123. Khách cần đăng nhập lại và đổi mật khẩu ngay.");
         return "redirect:/landlord/nguoi-dung";
     }
 }

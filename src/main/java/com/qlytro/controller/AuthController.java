@@ -1,5 +1,6 @@
 package com.qlytro.controller;
 
+import com.qlytro.security.CustomUserDetails;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,10 @@ public class AuthController {
     public String loginPage(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken)) {
+            if (authentication.getPrincipal() instanceof CustomUserDetails user
+                    && user.isMustChangePassword()) {
+                return "redirect:/tenant/change-password";
+            }
             boolean isLandlord = authentication.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ROLE_LANDLORD"));
             return isLandlord ? "redirect:/landlord/dashboard" : "redirect:/tenant/dashboard";
@@ -23,6 +28,10 @@ public class AuthController {
     public String root(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken)) {
+            if (authentication.getPrincipal() instanceof CustomUserDetails user
+                    && user.isMustChangePassword()) {
+                return "redirect:/tenant/change-password";
+            }
             boolean isLandlord = authentication.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ROLE_LANDLORD"));
             return isLandlord ? "redirect:/landlord/dashboard" : "redirect:/tenant/dashboard";
@@ -35,4 +44,3 @@ public class AuthController {
         return "error/403";
     }
 }
-

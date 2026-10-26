@@ -15,6 +15,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/landlord/khach-thue")
 public class KhachThueController {
 
+    private static final String MAT_KHAU_KHOI_TAO = "123";
+
     private final KhachThueService khachThueService;
     private final NguoiDungService nguoiDungService;
 
@@ -50,11 +52,15 @@ public class KhachThueController {
                        BindingResult result,
                        @RequestParam(defaultValue = "false") boolean taoTaiKhoan,
                        @RequestParam(required = false) String username,
-                       @RequestParam(required = false) String password,
                        Model model,
                        RedirectAttributes redirectAttributes) {
+        if (taoTaiKhoan && (request.getSdt() == null || !request.getSdt().matches("[0-9]{10}"))) {
+            result.rejectValue("sdt", "phone.invalid",
+                    "Số điện thoại là bắt buộc và phải gồm đúng 10 chữ số.");
+        }
         if (result.hasErrors()) {
             model.addAttribute("taoTaiKhoan", taoTaiKhoan);
+            model.addAttribute("username", username);
             model.addAttribute("pageTitle", "Thêm Khách thuê");
 
             // SỬA 3: Khi lỗi validate thì trả lại form trong base
@@ -62,11 +68,20 @@ public class KhachThueController {
             return "layout/base";
         }
 
+        if (taoTaiKhoan && (username == null || username.isBlank())) {
+            model.addAttribute("taoTaiKhoan", true);
+            model.addAttribute("username", username);
+            model.addAttribute("accountErrorMsg", "Vui lòng nhập tên đăng nhập cho khách.");
+            model.addAttribute("pageTitle", "Thêm Khách thuê");
+            model.addAttribute("pageContent", "landlord/khach-thue/form");
+            return "layout/base";
+        }
+
         // Neu chon tao kem tai khoan
-        if (taoTaiKhoan && username != null && !username.isBlank()) {
+        if (taoTaiKhoan) {
             NguoiDungRequest ndReq = new NguoiDungRequest();
             ndReq.setUsername(username);
-            ndReq.setPassword(password);
+            ndReq.setPassword(MAT_KHAU_KHOI_TAO);
             ndReq.setHoTen(request.getHoTen());
             ndReq.setSdt(request.getSdt());
             ndReq.setVaiTro(0); // KHACH_THUE

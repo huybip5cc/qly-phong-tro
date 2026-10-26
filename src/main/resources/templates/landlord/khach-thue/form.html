@@ -41,28 +41,34 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="sdt" class="form-label fw-500">Số điện thoại</label>
-                    <input type="text" id="sdt" th:field="*{sdt}" class="form-control" placeholder="0901234567">
+                    <label for="sdt" class="form-label fw-500">Số điện thoại
+                        <span id="phoneRequired" class="text-danger"
+                              th:style="${taoTaiKhoan} ? 'display:inline' : 'display:none'">*</span>
+                    </label>
+                    <input type="tel" id="sdt" th:field="*{sdt}" class="form-control"
+                           th:classappend="${#fields.hasErrors('sdt')} ? 'is-invalid'"
+                           placeholder="0901234567" inputmode="numeric" maxlength="10" pattern="[0-9]{10}"
+                           th:required="${taoTaiKhoan}">
+                    <div class="invalid-feedback" th:errors="*{sdt}"></div>
                 </div>
 
                 <!-- Chi hien thi khi them moi -->
                 <div th:if="${id == null}" class="mb-4 p-3 rounded" style="background:#f8fafc; border:1px solid #e2e8f0;">
                     <div class="form-check mb-2">
                         <input class="form-check-input" type="checkbox" id="taoTaiKhoan" name="taoTaiKhoan"
-                               onchange="toggleTaiKhoan(this)">
+                               th:checked="${taoTaiKhoan}" onchange="toggleTaiKhoan(this)">
                         <label class="form-check-label fw-500" for="taoTaiKhoan">
                             Tạo tài khoản đăng nhập cho khách này
                         </label>
                     </div>
                     <div id="taiKhoanBox" style="display:none;">
                         <div class="mb-2">
-                            <label class="form-label" style="font-size:.85rem;">Username</label>
-                            <input type="text" name="username" class="form-control form-control-sm" placeholder="VD: khach01">
+                            <label class="form-label" for="username" style="font-size:.85rem;">Tên đăng nhập</label>
+                            <input type="text" id="username" name="username" th:value="${username}"
+                                   class="form-control form-control-sm" placeholder="VD: khach01">
+                            <div class="text-danger small" th:if="${accountErrorMsg}" th:text="${accountErrorMsg}"></div>
                         </div>
-                        <div>
-                            <label class="form-label" style="font-size:.85rem;">Mật khẩu</label>
-                            <input type="password" name="password" class="form-control form-control-sm" placeholder="Tối thiểu 6 ký tự">
-                        </div>
+                        <small class="text-muted">Mật khẩu tạm thời: <strong>123</strong>. Khách sẽ phải đổi sau lần đăng nhập đầu tiên.</small>
                     </div>
                 </div>
 
@@ -83,8 +89,18 @@
             var box = document.getElementById('taiKhoanBox');
             if (box) {
                 box.style.display = cb.checked ? 'block' : 'none';
+                var username = document.getElementById('username');
+                if (username) username.required = cb.checked;
+                var phone = document.getElementById('sdt');
+                if (phone) phone.required = cb.checked;
+                var phoneRequired = document.getElementById('phoneRequired');
+                if (phoneRequired) phoneRequired.style.display = cb.checked ? 'inline' : 'none';
             }
         }
+        document.addEventListener('DOMContentLoaded', function () {
+            var checkbox = document.getElementById('taoTaiKhoan');
+            if (checkbox) toggleTaiKhoan(checkbox);
+        });
     </script>
 </div>
 </body>

@@ -119,6 +119,9 @@
         <i class="bi bi-exclamation-triangle-fill"></i>
         Tên đăng nhập hoặc mật khẩu không đúng.
     </div>
+    <div th:if="${param.expired}" class="alert alert-warning">
+        Phiên đăng nhập đã kết thúc. Vui lòng đăng nhập lại.
+    </div>
     <div th:if="${param.logout}" class="alert-success-login mb-3">
         <i class="bi bi-check-circle-fill"></i>
         Bạn đã đăng xuất thành công.

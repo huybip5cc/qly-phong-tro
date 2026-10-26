@@ -8,23 +8,32 @@ import com.qlytro.entity.enums.VaiTroNguoiDung;
 import com.qlytro.exception.BusinessException;
 import com.qlytro.exception.ResourceNotFoundException;
 import com.qlytro.repository.NguoiDungRepository;
+import com.qlytro.security.CustomUserDetails;
 import com.qlytro.service.base.BaseService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Service
 @Transactional
 public class NguoiDungService implements BaseService<NguoiDungResponse, Integer> {
 
+    private static final String MAT_KHAU_KHOI_TAO_KHACH = "123";
+
     private final NguoiDungRepository nguoiDungRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SessionRegistry sessionRegistry;
 
     public NguoiDungService(NguoiDungRepository nguoiDungRepository,
-                             PasswordEncoder passwordEncoder) {
+                             PasswordEncoder passwordEncoder,
+                             SessionRegistry sessionRegistry) {
         this.nguoiDungRepository = nguoiDungRepository;
         this.passwordEncoder = passwordEncoder;
+        this.sessionRegistry = sessionRegistry;
     }
 
     @Override
@@ -44,9 +53,51 @@ public class NguoiDungService implements BaseService<NguoiDungResponse, Integer>
         if (nguoiDungRepository.existsByUsername(request.getUsername())) {
             throw new BusinessException("Username '" + request.getUsername() + "' đã tồn tại.");
         }
+        if (Integer.valueOf(VaiTroNguoiDung.KHACH_THUE.getValue()).equals(request.getVaiTro())
+                && (request.getSdt() == null || !request.getSdt().matches("[0-9]{10}"))) {
+            throw new BusinessException("Số điện thoại khách thuê phải gồm đúng 10 chữ số.");
+        }
         NguoiDung nd = new NguoiDung();
         mapFromRequest(request, nd, true);
+        nd.setMustChangePassword(nd.getVaiTro() == VaiTroNguoiDung.KHACH_THUE);
         return toResponse(nguoiDungRepository.save(nd));
+    }
+
+    public void changePassword(Integer id, String currentPassword, String newPassword) {
+        NguoiDung nd = nguoiDungRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Người dùng", id));
+        if (!passwordEncoder.matches(currentPassword, nd.getPassword())) {
+            throw new BusinessException("Mật khẩu hiện tại không chính xác.");
+        }
+        if (newPassword.getBytes(StandardCharsets.UTF_8).length > 72) {
+            throw new BusinessException("Mật khẩu mới không được vượt quá 72 byte UTF-8.");
+        }
+        if (passwordEncoder.matches(newPassword, nd.getPassword())) {
+            throw new BusinessException("Mật khẩu mới phải khác mật khẩu hiện tại.");
+        }
+
+        nd.setPassword(passwordEncoder.encode(newPassword));
+        nd.setMustChangePassword(false);
+        nguoiDungRepository.save(nd);
+    }
+
+    public void resetTenantPassword(Integer id) {
+        NguoiDung nd = nguoiDungRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Người dùng", id));
+        if (nd.getVaiTro() != VaiTroNguoiDung.KHACH_THUE) {
+            throw new BusinessException("Chỉ có thể đặt lại mật khẩu cho tài khoản khách thuê.");
+        }
+
+        nd.setPassword(passwordEncoder.encode(MAT_KHAU_KHOI_TAO_KHACH));
+        nd.setMustChangePassword(true);
+        nguoiDungRepository.save(nd);
+
+        sessionRegistry.getAllPrincipals().stream()
+                .filter(CustomUserDetails.class::isInstance)
+                .map(CustomUserDetails.class::cast)
+                .filter(user -> user.getId().equals(id))
+                .flatMap(user -> sessionRegistry.getAllSessions(user, false).stream())
+                .forEach(SessionInformation::expireNow);
     }
 
     public NguoiDungResponse update(Integer id, NguoiDungRequest request) {

@@ -45,6 +45,8 @@ CREATE TABLE nguoi_dung (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     username        VARCHAR(50) NOT NULL UNIQUE,
     password        VARCHAR(255) NOT NULL COMMENT 'Luu dang hash BCrypt',
+    must_change_password BOOLEAN NOT NULL DEFAULT FALSE
+                    COMMENT 'Bat buoc doi mat khau tam thoi khi dang nhap',
     ho_ten          VARCHAR(100) NOT NULL,
     sdt             VARCHAR(15) NULL,
     email           VARCHAR(100) NULL,
